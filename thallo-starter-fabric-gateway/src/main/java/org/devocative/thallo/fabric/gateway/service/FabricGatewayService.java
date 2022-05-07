@@ -1,6 +1,6 @@
 package org.devocative.thallo.fabric.gateway.service;
 
-import org.devocative.thallo.fabric.gateway.FabricGatewayProperties;
+import org.devocative.thallo.fabric.gateway.config.FabricGatewayProperties;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricCAService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricTransactionReader;

@@ -1,13 +1,13 @@
-package org.devocative.thallo.fabric.gateway;
+package org.devocative.thallo.fabric.gateway.config;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 @Getter
 @Setter
-@Component
+@Configuration
 @ConfigurationProperties(prefix = "thallo.fabric.gateway")
 public class FabricGatewayProperties {
 	private String channel;

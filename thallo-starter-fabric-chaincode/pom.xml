@@ -11,7 +11,17 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>org.hyperledger.fabric-chaincode-java</groupId>
+			<artifactId>fabric-chaincode-shim</artifactId>
+			<version>${d.fabric-shim}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.github.classgraph</groupId>
+					<artifactId>classgraph</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<modelVersion>4.0.0</modelVersion>
