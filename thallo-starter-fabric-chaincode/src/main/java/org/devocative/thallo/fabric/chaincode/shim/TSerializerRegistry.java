@@ -40,7 +40,7 @@ public class TSerializerRegistry {
 	public void findAndSetContents() throws InstantiationException, IllegalAccessException {
 
 		final Set<String> basePackages = ClassUtil.findBasePackages(context);
-		basePackages.add(config.getSerializer().getFabricBasePackage());
+		basePackages.addAll(config.getSerializer().getInitBasePackages());
 		basePackages.addAll(config.getSerializer().getScanPackages());
 
 		log.info("Scan for @{}: basePackage = {}", annotationClass.getSimpleName(), basePackages);

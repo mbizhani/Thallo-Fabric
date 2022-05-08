@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -27,7 +28,9 @@ public class FabricChaincodeProperties {
 	@Getter
 	@Setter
 	public static class SerializerConfig {
-		private String fabricBasePackage = "org.hyperledger.fabric.contract";
+		private List<String> initBasePackages = Arrays.asList(
+			"org.hyperledger.fabric.contract",
+			"org.devocative.thallo.fabric.chaincode.shim");
 		private List<String> scanPackages = new ArrayList<>();
 	}
 }
