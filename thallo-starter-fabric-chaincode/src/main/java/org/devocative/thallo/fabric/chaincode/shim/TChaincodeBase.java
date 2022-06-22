@@ -43,13 +43,11 @@ public class TChaincodeBase extends ChaincodeBase {
 		this.serializers = serializers;
 		this.context = context;
 
-		chaincodeId = System.getenv("CHAINCODE_ID") != null ?
-			System.getenv("CHAINCODE_ID") :
-			properties.getChaincodeId();
+		chaincodeId = properties.getId();
 		if (chaincodeId == null || chaincodeId.isEmpty()) {
 			throw new RuntimeException("Chaincode ID Not Found");
 		}
-		log.info("--- TChaincodeBase - chaincodeId = {}", chaincodeId);
+		log.info("--- TChaincodeBase - Chaincode ID = {}", chaincodeId);
 	}
 
 	// ------------------------------

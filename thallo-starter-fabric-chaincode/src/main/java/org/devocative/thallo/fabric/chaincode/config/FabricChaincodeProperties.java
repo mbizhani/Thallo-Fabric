@@ -12,12 +12,13 @@ import java.util.List;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "borna.hlf.cc")
+@ConfigurationProperties(prefix = "thallo.fabric.chaincode")
 public class FabricChaincodeProperties {
-	private String chaincodeId;
+	private String id;
 	private String serverAddress;
 	private DataTypeConfig dataType = new DataTypeConfig();
 	private SerializerConfig serializer = new SerializerConfig();
+	private TLSConfig tls = new TLSConfig();
 
 	@Getter
 	@Setter
@@ -32,5 +33,14 @@ public class FabricChaincodeProperties {
 			"org.hyperledger.fabric.contract",
 			"org.devocative.thallo.fabric.chaincode.shim");
 		private List<String> scanPackages = new ArrayList<>();
+	}
+
+	@Getter
+	@Setter
+	public static class TLSConfig {
+		private boolean enabled;
+		private String certFile;
+		private String keyFile;
+		private String keyFilePassword;
 	}
 }
