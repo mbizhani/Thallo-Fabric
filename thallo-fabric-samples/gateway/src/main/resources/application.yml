@@ -1,0 +1,10 @@
+thallo:
+  fabric:
+    gateway:
+      chaincode: mycc
+      channel: ch1
+      org-msp-id: SampleOrg
+      connection-profile-file: thallo-fabric-samples/sample-connection-profile.yml
+      identity:
+        certificate-pem-file: start-fabric-dev-mode/files/config/msp/admincerts/admincert.pem
+        private-key-pem-file: start-fabric-dev-mode/files/config/msp/keystore/key.pem

@@ -14,6 +14,7 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
 import org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric_ca.sdk.exception.RegistrationException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +28,7 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@ConditionalOnProperty(name = "thallo.fabric.gateway.ca-server")
 public class FabricCAService implements IFabricCAService {
 	private final FabricGatewayProperties properties;
 

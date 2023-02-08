@@ -16,6 +16,7 @@ public class FabricGatewayProperties {
 	private String identityWalletDir;
 	private String orgMspId;
 	private CAServerProperties caServer;
+	private IdentityProperties identity;
 
 	@Getter
 	@Setter
@@ -24,5 +25,12 @@ public class FabricGatewayProperties {
 		private String url;
 		private String username;
 		private String password;
+	}
+
+	@Getter
+	@Setter
+	public static class IdentityProperties {
+		private String privateKeyPemFile;
+		private String certificatePemFile;
 	}
 }

@@ -1,0 +1,15 @@
+name: "ThalloSampleGateway"
+version: 1.0.0
+
+client:
+  organization: SampleOrg
+
+organizations:
+  SampleOrg:
+    mspid: SampleOrg
+    peers:
+      - 127.0.0.1
+
+peers:
+  127.0.0.1:
+    url: "grpc://127.0.0.1:7051"

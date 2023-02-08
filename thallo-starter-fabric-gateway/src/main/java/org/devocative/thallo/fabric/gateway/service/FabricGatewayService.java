@@ -4,10 +4,7 @@ import org.devocative.thallo.fabric.gateway.config.FabricGatewayProperties;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricCAService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricTransactionReader;
-import org.hyperledger.fabric.gateway.Contract;
-import org.hyperledger.fabric.gateway.Gateway;
-import org.hyperledger.fabric.gateway.Network;
-import org.hyperledger.fabric.gateway.Wallet;
+import org.hyperledger.fabric.gateway.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -16,16 +13,20 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FabricGatewayService implements IFabricGatewayService {
 	private static final Logger log = LoggerFactory.getLogger(FabricGatewayService.class);
 
 	private final FabricGatewayProperties properties;
-	private final IFabricCAService caService;
+	private final Optional<IFabricCAService> caServiceOpt;
 	private final List<? extends IFabricTransactionReader> transactionReaders;
 	private final ThreadPoolTaskExecutor taskExecutor;
 
@@ -35,12 +36,12 @@ public class FabricGatewayService implements IFabricGatewayService {
 
 	public FabricGatewayService(
 		FabricGatewayProperties properties,
-		IFabricCAService caService,
+		Optional<IFabricCAService> caServiceOpt,
 		List<? extends IFabricTransactionReader> transactionReaders,
 		ThreadPoolTaskExecutor taskExecutor) {
 
 		this.properties = properties;
-		this.caService = caService;
+		this.caServiceOpt = caServiceOpt;
 		this.transactionReaders = transactionReaders;
 		this.taskExecutor = taskExecutor;
 	}
@@ -50,16 +51,27 @@ public class FabricGatewayService implements IFabricGatewayService {
 	@PostConstruct
 	public void init() {
 		try {
-			final String username = properties.getCaServer().getUsername();
-			final Wallet wallet = caService.enroll(username, properties.getCaServer().getPassword());
-
 			final Path networkConfigPath = Paths.get(properties.getConnectionProfileFile());
 
 			final Gateway.Builder builder = Gateway.createBuilder();
-			Gateway gateway = builder
-				.identity(wallet, username)
-				.networkConfig(networkConfigPath)
-				.connect();
+			builder.networkConfig(networkConfigPath);
+
+			if (caServiceOpt.isPresent()) {
+				final String username = properties.getCaServer().getUsername();
+
+				final IFabricCAService caService = caServiceOpt.get();
+				final Wallet wallet = caService.enroll(username, properties.getCaServer().getPassword());
+
+				builder.identity(wallet, username);
+			} else {
+				//TODO: assert properties.getIdentity() not null
+				//TODO: read pem files content instead of file address
+				final PrivateKey privateKey = Identities.readPrivateKey(new FileReader(properties.getIdentity().getPrivateKeyPemFile()));
+				final X509Certificate certificate = Identities.readX509Certificate(new FileReader(properties.getIdentity().getCertificatePemFile()));
+				builder.identity(Identities.newX509Identity(properties.getOrgMspId(), certificate, privateKey));
+			}
+
+			final Gateway gateway = builder.connect();
 
 			network = gateway.getNetwork(properties.getChannel());
 		} catch (Exception e) {
