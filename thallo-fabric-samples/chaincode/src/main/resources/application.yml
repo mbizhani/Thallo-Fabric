@@ -1,0 +1,7 @@
+thallo:
+  fabric:
+    chaincode:
+      id: "mycc:1.0"
+      dev-mode:
+        enabled: true
+      server-address: "127.0.0.1:9999"

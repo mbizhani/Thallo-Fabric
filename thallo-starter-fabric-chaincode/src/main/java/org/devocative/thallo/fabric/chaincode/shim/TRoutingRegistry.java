@@ -89,7 +89,7 @@ public class TRoutingRegistry implements RoutingRegistry {
 		final ContractDefinition contract = contracts.get(namespace);
 
 		if (contract == null) {
-			throw new ContractRuntimeException("Undefined Contract Called");
+			throw new ContractRuntimeException("Undefined Contract Called: " + namespace);
 		}
 
 		return contract;

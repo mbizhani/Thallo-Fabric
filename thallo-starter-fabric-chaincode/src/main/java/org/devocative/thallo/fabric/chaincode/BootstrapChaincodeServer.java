@@ -51,6 +51,11 @@ public class BootstrapChaincodeServer {
 
 		final FabricChaincodeProperties.TLSConfig tls = properties.getTls();
 		if (tls != null && tls.isEnabled()) {
+			final FabricChaincodeProperties.DevMode devMode = properties.getDevMode();
+			if (devMode != null && devMode.isEnabled()) {
+				throw new RuntimeException("Invalid State: Both TLS & DevMode are enabled!");
+			}
+
 			chaincodeServerProperties.setTlsEnabled(true);
 			chaincodeServerProperties.setKeyCertChainFile(tls.getCertFile());
 			chaincodeServerProperties.setKeyFile(tls.getKeyFile());

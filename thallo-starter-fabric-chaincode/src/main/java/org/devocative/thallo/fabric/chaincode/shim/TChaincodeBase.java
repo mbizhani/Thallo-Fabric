@@ -23,6 +23,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,6 +36,7 @@ public class TChaincodeBase extends ChaincodeBase {
 	private final RoutingRegistry registry;
 	private final TSerializerRegistry serializers;
 	private final ApplicationContext context;
+	private final FabricChaincodeProperties properties;
 
 	private final String chaincodeId;
 
@@ -41,27 +45,51 @@ public class TChaincodeBase extends ChaincodeBase {
 	public TChaincodeBase(RoutingRegistry registry, TSerializerRegistry serializers, FabricChaincodeProperties properties, ApplicationContext context) {
 		this.registry = registry;
 		this.serializers = serializers;
+		this.properties = properties;
 		this.context = context;
 
 		chaincodeId = properties.getId();
 		if (chaincodeId == null || chaincodeId.isEmpty()) {
 			throw new RuntimeException("Chaincode ID Not Found");
 		}
-		log.info("--- TChaincodeBase - Chaincode ID = {}", chaincodeId);
+
+		if (properties.getDevMode() != null && properties.getDevMode().isEnabled()) {
+			log.info("--- TChaincodeBase (*** D E V   M O D E ***) - Chaincode ID = {}", chaincodeId);
+		} else {
+			log.info("--- TChaincodeBase - Chaincode ID = {}", chaincodeId);
+		}
 	}
 
 	// ------------------------------
 
 	@PostConstruct
 	public void init() {
+		final FabricChaincodeProperties.DevMode devMode = properties.getDevMode();
+
+		final List<String> args = new ArrayList<>();
+		args.add("-i");
+		args.add(chaincodeId);
+		if (devMode != null && devMode.isEnabled()) {
+			args.add("-a");
+			args.add(devMode.getPeerAddress());
+		}
+
 		super.initializeLogging();
 		super.processEnvironmentOptions();
-		super.processCommandLineOptions(new String[]{"-i", chaincodeId});
+		super.processCommandLineOptions(args.toArray(new String[0]));
 		super.validateOptions();
 
 		final Properties props = super.getChaincodeConfig();
 		Metrics.initialize(props);
 		Traces.initialize(props);
+
+		if (devMode != null && devMode.isEnabled()) {
+			try {
+				connectToPeer();
+			} catch (IOException e) {
+				log.error("DevMode: ConnectToPeer", e);
+			}
+		}
 
 		final Map<String, ContractInterface> contracts = context.getBeansOfType(ContractInterface.class);
 		contracts.values().forEach(contractInterface -> {
@@ -98,7 +126,11 @@ public class TChaincodeBase extends ChaincodeBase {
 	private Response processRequest(final ChaincodeStub stub) {
 		try {
 			if (stub.getStringArgs().size() > 0) {
-				log.info("Got the Invoke Request: func = {}({})", stub.getFunction(), stub.getParameters());
+				if (log.isDebugEnabled()) {
+					log.debug("TChaincodeBase: Incoming Request - func = {}({})", stub.getFunction(), stub.getParameters());
+				} else {
+					log.info("TChaincodeBase: Incoming Request - func = {}", stub.getFunction());
+				}
 				final InvocationRequest request = ExecutionFactory.getInstance().createRequest(stub);
 				final TxFunction txFn = getRouting(request);
 

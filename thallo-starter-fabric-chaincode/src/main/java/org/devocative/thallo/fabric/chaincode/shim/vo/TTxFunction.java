@@ -34,14 +34,16 @@ public class TTxFunction implements TxFunction {
 		this.method = method;
 
 		String name = null;
-		if (method.getAnnotation(Transaction.class) != null) {
-			if (method.getAnnotation(Transaction.class).intent() == Transaction.TYPE.SUBMIT) {
+		if (method.isAnnotationPresent(Transaction.class)) {
+			final Transaction trxAnnot = method.getAnnotation(Transaction.class);
+
+			if (trxAnnot.intent() == Transaction.TYPE.SUBMIT) {
 				this.type = TransactionType.SUBMIT;
 			} else {
 				this.type = TransactionType.EVALUATE;
 			}
 
-			final String txnName = method.getAnnotation(Transaction.class).name();
+			final String txnName = trxAnnot.name();
 			if (!txnName.isEmpty()) {
 				name = txnName;
 			}

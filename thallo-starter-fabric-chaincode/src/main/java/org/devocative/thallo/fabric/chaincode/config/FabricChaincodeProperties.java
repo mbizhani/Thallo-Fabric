@@ -19,6 +19,7 @@ public class FabricChaincodeProperties {
 	private DataTypeConfig dataType = new DataTypeConfig();
 	private SerializerConfig serializer = new SerializerConfig();
 	private TLSConfig tls = new TLSConfig();
+	private DevMode devMode = new DevMode();
 
 	@Getter
 	@Setter
@@ -42,5 +43,12 @@ public class FabricChaincodeProperties {
 		private String certFile;
 		private String keyFile;
 		private String keyFilePassword;
+	}
+
+	@Getter
+	@Setter
+	public static class DevMode {
+		private boolean enabled = false;
+		private String peerAddress = "127.0.0.1:7052";
 	}
 }
