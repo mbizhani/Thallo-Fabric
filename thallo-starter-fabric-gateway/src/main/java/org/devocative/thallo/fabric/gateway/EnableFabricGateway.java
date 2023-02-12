@@ -1,6 +1,6 @@
 package org.devocative.thallo.fabric.gateway;
 
-import org.devocative.thallo.fabric.gateway.config.FabricClientsRegistrar;
+import org.devocative.thallo.fabric.gateway.scanner.FabricClientsRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

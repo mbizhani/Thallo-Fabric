@@ -129,23 +129,27 @@ function start() {
 }
 
 function callCC() {
-  FUNC=${1:-init}
+  TYPE=${1:-q}
+  FUNC=${2:-getTime}
+  ARGS=${3:-""}
 
-  echo "--- INVOKE: f=${FUNC} ---"
-  "${BASE_DIR}"/bin/peer chaincode invoke \
-    -o "127.0.0.1:7050" \
-    --channelID ${CH_NAME} \
-    --name ${CC_NAME} \
-    --peerAddresses "127.0.0.1:7051" \
-    -c "{\"function\":\"${FUNC}\",\"Args\":[]}"
-
-  echo "--- QUERY: f=${FUNC} ---"
-  "${BASE_DIR}"/bin/peer chaincode query \
-    -o "127.0.0.1:7050" \
-    --channelID ${CH_NAME} \
-    --name ${CC_NAME} \
-    --peerAddresses "127.0.0.1:7051" \
-    -c "{\"function\":\"${FUNC}\",\"Args\":[]}"
+  if [ "${TYPE}" == "i" ]; then
+    echo "--- INVOKE: f=${FUNC} ---"
+    "${BASE_DIR}"/bin/peer chaincode invoke \
+      -o "127.0.0.1:7050" \
+      --channelID ${CH_NAME} \
+      --name ${CC_NAME} \
+      --peerAddresses "127.0.0.1:7051" \
+      -c "{\"function\":\"${FUNC}\",\"Args\":[${ARGS}]}"
+  else
+    echo "--- QUERY: f=${FUNC} ---"
+    "${BASE_DIR}"/bin/peer chaincode query \
+      -o "127.0.0.1:7050" \
+      --channelID ${CH_NAME} \
+      --name ${CC_NAME} \
+      --peerAddresses "127.0.0.1:7051" \
+      -c "{\"function\":\"${FUNC}\",\"Args\":[${ARGS}]}"
+  fi
 }
 
 ####
@@ -158,7 +162,7 @@ case $1 in
     stop
   ;;
   'call')
-    callCC "$2"
+    callCC "$2" "$3" "$4"
   ;;
   'info')
     printInfo

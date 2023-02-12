@@ -1,5 +1,6 @@
 package org.devocative.thallo.fabric.gateway.service;
 
+import org.devocative.thallo.fabric.gateway.SystemException;
 import org.devocative.thallo.fabric.gateway.config.FabricGatewayProperties;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricCAService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
@@ -20,6 +21,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class FabricGatewayService implements IFabricGatewayService {
@@ -93,23 +95,27 @@ public class FabricGatewayService implements IFabricGatewayService {
 	// ---------------
 
 	@Override
-	public byte[] submit(String method, String... args) throws Exception {
+	public byte[] submit(String method, String... args) throws ContractException {
 		return submit(properties.getChaincode(), method, args);
 	}
 
 	@Override
-	public byte[] submit(String chaincode, String method, String... args) throws Exception {
+	public byte[] submit(String chaincode, String method, String... args) throws ContractException {
 		final Contract contract = network.getContract(getChaincode(chaincode));
-		return contract.submitTransaction(method, args != null ? args : new String[0]);
+		try {
+			return contract.submitTransaction(method, args != null ? args : new String[0]);
+		} catch (TimeoutException | InterruptedException e) {
+			throw new SystemException(e);
+		}
 	}
 
 	@Override
-	public byte[] evaluate(String method, String... args) throws Exception {
+	public byte[] evaluate(String method, String... args) throws ContractException {
 		return evaluate(properties.getChaincode(), method, args);
 	}
 
 	@Override
-	public byte[] evaluate(String chaincode, String method, String... args) throws Exception {
+	public byte[] evaluate(String chaincode, String method, String... args) throws ContractException {
 		final Contract contract = network.getContract(getChaincode(chaincode));
 		return contract.evaluateTransaction(method, args != null ? args : new String[0]);
 	}

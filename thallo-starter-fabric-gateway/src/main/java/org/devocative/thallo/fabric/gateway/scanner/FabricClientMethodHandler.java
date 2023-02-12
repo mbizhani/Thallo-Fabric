@@ -1,8 +1,6 @@
-package org.devocative.thallo.fabric.gateway.config;
+package org.devocative.thallo.fabric.gateway.scanner;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.devocative.thallo.fabric.gateway.FabricClient;
 import org.devocative.thallo.fabric.gateway.Submit;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
@@ -11,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class FabricClientMethodHandler implements InvocationHandler {
@@ -57,54 +53,43 @@ public class FabricClientMethodHandler implements InvocationHandler {
 			if (args != null) {
 				chaincodeArgs = new String[args.length];
 				for (int i = 0; i < args.length; i++) {
-					chaincodeArgs[i] = args[i] != null ? args[i].toString() : "";
+					chaincodeArgs[i] = args[i] != null ? objectMapper.writeValueAsString(args[i]) : "";
 				}
 			}
 
 			final byte[] result;
 			if (method.isAnnotationPresent(Submit.class)) {
-				log.info("Submit: chaincode=[{}], method=[{}], args={}",
-					chaincode, method.getName(), Arrays.toString(chaincodeArgs));
+				if (log.isDebugEnabled()) {
+					log.debug("Submit: chaincode=[{}], method=[{}], args={}",
+						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
+				} else {
+					log.info("Submit: chaincode=[{}], method=[{}]", chaincode, method.getName());
+				}
+
 				result = hlfService.submit(chaincode, method.getName(), chaincodeArgs);
 			} else {
-				log.info("Evaluate: chaincode=[{}], method=[{}], args={}",
-					chaincode, method.getName(), Arrays.toString(chaincodeArgs));
+				if (log.isDebugEnabled()) {
+					log.debug("Evaluate: chaincode=[{}], method=[{}], args={}",
+						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
+				} else {
+					log.info("Evaluate: chaincode=[{}], method=[{}]", chaincode, method.getName());
+				}
+
 				result = hlfService.evaluate(chaincode, method.getName(), chaincodeArgs);
 			}
-			final String resultAsStr = new String(result);
-			log.info("Result: method=[{}], result=[{}]", method.getName(), resultAsStr);
-			return processResult(method, result, resultAsStr);
+			log.info("Result: method=[{}]", method.getName());
+			return processResult(method, result);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("HlfClient: %s::%s(%s)",
 				clientInterfaceClass.getCanonicalName(), method.getName(), Arrays.toString(args)), e);
 		}
 	}
 
-	private Object processResult(Method method, byte[] result, String resultAsStr) throws Exception {
+	private Object processResult(Method method, byte[] result) throws Exception {
 		final Class<?> returnClass = method.getReturnType();
-		if (byte[].class.equals(returnClass)) {
-			return result;
-		} else if (Void.TYPE.equals(returnClass)) {
+		if (Void.TYPE.equals(returnClass)) {
 			return null;
-		} else if (String.class.equals(returnClass)) {
-			return resultAsStr;
-		} else if (Boolean.class.equals(returnClass)) {
-			return Boolean.valueOf(resultAsStr);
-		} else if (Integer.class.equals(returnClass)) {
-			return Integer.valueOf(resultAsStr);
-		} else if (Long.class.equals(returnClass)) {
-			return Long.valueOf(resultAsStr);
-		} else if (Float.class.equals(returnClass)) {
-			return Float.valueOf(resultAsStr);
-		} else if (Double.class.equals(returnClass)) {
-			return Double.valueOf(resultAsStr);
-		} else if (BigDecimal.class.equals(returnClass)) {
-			return new BigDecimal(resultAsStr);
-		} else {
-			final Type genericReturnType = method.getGenericReturnType();
-			final TypeFactory typeFactory = objectMapper.getTypeFactory();
-			final JavaType javaType = typeFactory.constructType(genericReturnType);
-			return objectMapper.readValue(resultAsStr, javaType);
 		}
+		return objectMapper.readValue(result, returnClass);
 	}
 }

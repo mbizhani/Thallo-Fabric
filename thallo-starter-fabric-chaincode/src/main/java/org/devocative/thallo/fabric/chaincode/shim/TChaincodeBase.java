@@ -7,7 +7,6 @@ import org.hyperledger.fabric.contract.execution.ExecutionFactory;
 import org.hyperledger.fabric.contract.execution.ExecutionService;
 import org.hyperledger.fabric.contract.execution.InvocationRequest;
 import org.hyperledger.fabric.contract.execution.SerializerInterface;
-import org.hyperledger.fabric.contract.metadata.MetadataBuilder;
 import org.hyperledger.fabric.contract.routing.ContractDefinition;
 import org.hyperledger.fabric.contract.routing.RoutingRegistry;
 import org.hyperledger.fabric.contract.routing.TxFunction;
@@ -107,8 +106,9 @@ public class TChaincodeBase extends ChaincodeBase {
 
 		final TypeRegistry typeRegistry = TypeRegistry.getRegistry();
 		registry.findAndSetContracts(typeRegistry);
-		MetadataBuilder.initialize(registry, typeRegistry);
-		log.info("TChaincodeBase.Metadata: {}", MetadataBuilder.debugString());
+		//TODO???
+		//MetadataBuilder.initialize(registry, typeRegistry);
+		//log.info("TChaincodeBase.Metadata: {}", MetadataBuilder.debugString());
 	}
 
 	@Override

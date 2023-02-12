@@ -55,7 +55,7 @@ public class TRoutingRegistry implements RoutingRegistry {
 		}
 
 		for (final Method m : clz.getMethods()) {
-			if (m.getAnnotation(Transaction.class) != null) {
+			if (m.isAnnotationPresent(Transaction.class)) {
 				contractDefinition.addTxFunction(m);
 				log.info("Contract Method Added: [{}.{}]", contractDefinition.getName(), m.getName());
 			}

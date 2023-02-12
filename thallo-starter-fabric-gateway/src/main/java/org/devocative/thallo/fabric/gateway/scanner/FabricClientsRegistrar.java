@@ -1,4 +1,4 @@
-package org.devocative.thallo.fabric.gateway.config;
+package org.devocative.thallo.fabric.gateway.scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.devocative.thallo.fabric.gateway.EnableFabricGateway;

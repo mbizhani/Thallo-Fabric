@@ -1,5 +1,6 @@
 package org.devocative.thallo.fabric.chaincode.shim.vo;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.ContractRuntimeException;
@@ -14,6 +15,7 @@ import org.hyperledger.fabric.contract.routing.impl.ParameterDefinitionImpl;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +53,7 @@ public class TTxFunction implements TxFunction {
 
 		this.name = name != null ? name : method.getName();
 		this.routing = new BornaRouting(method, contract);
-		this.returnSchema = TypeSchema.typeConvert(method.getReturnType());
+		this.returnSchema = createTypeSchema(method.getReturnType());
 
 		populateParams();
 	}
@@ -132,7 +134,7 @@ public class TTxFunction implements TxFunction {
 
 		for (final Parameter parameter : params) {
 			final TypeSchema paramMap = new TypeSchema();
-			final TypeSchema schema = TypeSchema.typeConvert(parameter.getType());
+			final TypeSchema schema = createTypeSchema(parameter.getType());
 
 			final Property annotation = parameter.getAnnotation(Property.class);
 			if (annotation != null) {
@@ -148,6 +150,14 @@ public class TTxFunction implements TxFunction {
 				parameter);
 			paramsList.add(pd);
 		}
+	}
+
+	private TypeSchema createTypeSchema(Class<?> cls) {
+		final TypeSchema schema = TypeSchema.typeConvert(cls);
+		if (schema != null) {
+			schema.put("type", new TTypeReference<>(cls));
+		}
+		return schema;
 	}
 
 	// ------------------------------
@@ -188,6 +198,19 @@ public class TTxFunction implements TxFunction {
 		@Override
 		public String getSerializerName() {
 			return serializerName;
+		}
+	}
+
+	public static class TTypeReference<T> extends TypeReference<T> {
+		private final Class<T> cls;
+
+		public TTypeReference(Class<T> cls) {
+			this.cls = cls;
+		}
+
+		@Override
+		public Type getType() {
+			return this.cls;
 		}
 	}
 }
