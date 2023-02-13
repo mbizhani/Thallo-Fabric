@@ -29,8 +29,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class FabricClientsRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, BeanFactoryAware {
-	private static final Logger log = LoggerFactory.getLogger(FabricClientsRegistrar.class);
+public class FabricClientScanner implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, BeanFactoryAware {
+	private static final Logger log = LoggerFactory.getLogger(FabricClientScanner.class);
 
 	private ResourceLoader resourceLoader;
 	private Environment environment;
@@ -57,10 +57,10 @@ public class FabricClientsRegistrar implements ImportBeanDefinitionRegistrar, Re
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-		log.info("*** HlfClientsRegistrar.registerBeanDefinitions ***");
+		log.info("*** FabricClientScanner.registerBeanDefinitions ***");
 
 		final Set<String> basePackages = getBasePackages(metadata);
-		log.info("HlfClientsRegistrar - basePackages: {}", basePackages);
+		log.info("FabricClientScanner - basePackages: {}", basePackages);
 
 		final ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false, environment) {
 			@Override
@@ -76,11 +76,11 @@ public class FabricClientsRegistrar implements ImportBeanDefinitionRegistrar, Re
 
 		try {
 			for (String basePackage : basePackages) {
-				log.info("HlfClientsRegistrar - process basePackage: {}", basePackage);
+				log.info("FabricClientScanner - process basePackage: {}", basePackage);
 
 				for (BeanDefinition beanDefinition : provider.findCandidateComponents(basePackage)) {
 					final Class<?> clientInterfaceClass = Class.forName(beanDefinition.getBeanClassName());
-					log.info("HlfClientsRegistrar - Hlf Client: {}", clientInterfaceClass.getName());
+					log.info("FabricClientScanner - @FabricClient: {}", clientInterfaceClass.getName());
 
 					final GenericBeanDefinition gbd = new GenericBeanDefinition();
 					gbd.setBeanClass(clientInterfaceClass);
@@ -97,7 +97,7 @@ public class FabricClientsRegistrar implements ImportBeanDefinitionRegistrar, Re
 				}
 			}
 
-			//TODO: throws exception if there is no HlfClient
+			//TODO: throws exception if there is no @FabricClient
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}

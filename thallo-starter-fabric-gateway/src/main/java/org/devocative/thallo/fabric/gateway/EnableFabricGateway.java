@@ -1,6 +1,6 @@
 package org.devocative.thallo.fabric.gateway;
 
-import org.devocative.thallo.fabric.gateway.scanner.FabricClientsRegistrar;
+import org.devocative.thallo.fabric.gateway.scanner.FabricClientScanner;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Documented
-@Import({FabricClientsRegistrar.class})
+@Import({FabricClientScanner.class})
 public @interface EnableFabricGateway {
 	String[] value() default {};
 

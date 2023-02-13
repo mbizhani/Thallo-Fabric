@@ -1,6 +1,5 @@
 package org.devocative.thallo.fabric.chaincode.shim.vo;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.ContractRuntimeException;
@@ -15,7 +14,6 @@ import org.hyperledger.fabric.contract.routing.impl.ParameterDefinitionImpl;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -155,7 +153,7 @@ public class TTxFunction implements TxFunction {
 	private TypeSchema createTypeSchema(Class<?> cls) {
 		final TypeSchema schema = TypeSchema.typeConvert(cls);
 		if (schema != null) {
-			schema.put("type", new TTypeReference<>(cls));
+			schema.put("type", cls);
 		}
 		return schema;
 	}
@@ -198,19 +196,6 @@ public class TTxFunction implements TxFunction {
 		@Override
 		public String getSerializerName() {
 			return serializerName;
-		}
-	}
-
-	public static class TTypeReference<T> extends TypeReference<T> {
-		private final Class<T> cls;
-
-		public TTypeReference(Class<T> cls) {
-			this.cls = cls;
-		}
-
-		@Override
-		public Type getType() {
-			return this.cls;
 		}
 	}
 }

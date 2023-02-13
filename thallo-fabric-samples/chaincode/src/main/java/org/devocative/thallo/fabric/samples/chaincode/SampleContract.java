@@ -19,7 +19,7 @@ import static org.hyperledger.fabric.contract.annotation.Transaction.TYPE.EVALUA
 
 @Slf4j
 @Default
-@Contract(name = "sample", transactionSerializer = "org.devocative.thallo.fabric.chaincode.shim.TJSONTransactionSerializer")
+@Contract(name = "sample")
 @Component
 public class SampleContract implements ContractInterface {
 	@Override

@@ -1,12 +1,14 @@
 package org.devocative.thallo.fabric.gateway.scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.devocative.thallo.fabric.gateway.Evaluate;
 import org.devocative.thallo.fabric.gateway.FabricClient;
 import org.devocative.thallo.fabric.gateway.Submit;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -30,7 +32,13 @@ public class FabricClientMethodHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) {
-		log.info("Invoke Client: method=[{}] args={}", method.getName(), Arrays.toString(args));
+		if (log.isDebugEnabled()) {
+			log.debug("Invoke @FabricClient: class=[{}] method=[{}] args={}",
+				clientInterfaceClass.getName(), method.getName(), Arrays.toString(args));
+		} else {
+			log.info("Invoke @FabricClient: class=[{}] method=[{}]",
+				clientInterfaceClass.getName(), method.getName());
+		}
 
 		switch (method.getName()) {
 			case "hashCode":
@@ -67,7 +75,7 @@ public class FabricClientMethodHandler implements InvocationHandler {
 				}
 
 				result = hlfService.submit(chaincode, method.getName(), chaincodeArgs);
-			} else {
+			} else if (method.isAnnotationPresent(Evaluate.class)) {
 				if (log.isDebugEnabled()) {
 					log.debug("Evaluate: chaincode=[{}], method=[{}], args={}",
 						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
@@ -76,8 +84,13 @@ public class FabricClientMethodHandler implements InvocationHandler {
 				}
 
 				result = hlfService.evaluate(chaincode, method.getName(), chaincodeArgs);
+			} else {
+				//TODO: change exception type
+				throw new RuntimeException("No Annotation for Client Method : method = " + method.getName());
 			}
+
 			log.info("Result: method=[{}]", method.getName());
+
 			return processResult(method, result);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("HlfClient: %s::%s(%s)",
@@ -85,7 +98,7 @@ public class FabricClientMethodHandler implements InvocationHandler {
 		}
 	}
 
-	private Object processResult(Method method, byte[] result) throws Exception {
+	private Object processResult(Method method, byte[] result) throws IOException {
 		final Class<?> returnClass = method.getReturnType();
 		if (Void.TYPE.equals(returnClass)) {
 			return null;

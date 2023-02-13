@@ -1,6 +1,5 @@
 package org.devocative.thallo.fabric.chaincode.shim;
 
-import org.devocative.thallo.fabric.chaincode.ClassUtil;
 import org.devocative.thallo.fabric.chaincode.config.FabricChaincodeProperties;
 import org.hyperledger.fabric.contract.annotation.Serializer;
 import org.hyperledger.fabric.contract.execution.SerializerInterface;
@@ -11,17 +10,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class TSerializerRegistry {
 	private static final Logger log = LoggerFactory.getLogger(TSerializerRegistry.class);
 
-	private final Map<String, SerializerInterface> contents = new HashMap<>();
-	private final Class<Serializer> annotationClass = Serializer.class;
-
+	private final Map<String, SerializerInterface> serializers = new HashMap<>();
 	private final FabricChaincodeProperties config;
 	private final ApplicationContext context;
+
+	private SerializerInterface defaultSerializer;
 
 	// ------------------------------
 
@@ -33,41 +31,28 @@ public class TSerializerRegistry {
 	// ------------------------------
 
 	public SerializerInterface getSerializer(final String name, final Serializer.TARGET target) {
-		final String key = name + ":" + target;
-		return contents.get(key);
+		if (serializers.containsKey(name)) {
+			return serializers.get(name);
+		} else if (defaultSerializer != null) {
+			return defaultSerializer;
+		} else {
+			throw new RuntimeException("No Valid Serializer: " + name);
+		}
 	}
 
 	public void findAndSetContents() throws InstantiationException, IllegalAccessException {
+		final Map<String, SerializerInterface> beans = context.getBeansOfType(SerializerInterface.class);
 
-		final Set<String> basePackages = ClassUtil.findBasePackages(context);
-		basePackages.addAll(config.getSerializer().getInitBasePackages());
-		basePackages.addAll(config.getSerializer().getScanPackages());
+		for (SerializerInterface value : beans.values()) {
+			final String name = value.getClass().getName();
+			serializers.put(name, value);
 
-		log.info("Scan for @{}: basePackage = {}", annotationClass.getSimpleName(), basePackages);
-
-		ClassUtil.scanPackagesForAnnotatedClasses(annotationClass, basePackages, beanDefinition -> {
-			try {
-				final Class<? extends SerializerInterface> cls = (Class<? extends SerializerInterface>) Class.forName(beanDefinition.getBeanClassName());
-				log.info("TSerializerRegistry - SerializerInterface = {}", cls.getName());
-				add(cls.getName(), Serializer.TARGET.TRANSACTION, cls);
-			} catch (ClassNotFoundException e) {
-				log.warn("@{} Class Not Found: {}",
-					annotationClass.getSimpleName(), beanDefinition.getBeanClassName(), e);
+			if (name.equals(config.getDefaultSerializer())) {
+				defaultSerializer = value;
+				log.info("TSerializerRegistry - default-serializer = {}", name);
+			} else {
+				log.info("TSerializerRegistry - serializer = {}", name);
 			}
-		});
-	}
-
-	// ------------------------------
-
-	private void add(final String name, final Serializer.TARGET target, final Class<? extends SerializerInterface> clazz) {
-		log.debug("Adding new Class [{}] for [{}]", clazz.getName(), target);
-
-		try {
-			final String key = name + ":" + target;
-			final SerializerInterface newObj = clazz.getDeclaredConstructor().newInstance();
-			contents.put(key, newObj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 }
