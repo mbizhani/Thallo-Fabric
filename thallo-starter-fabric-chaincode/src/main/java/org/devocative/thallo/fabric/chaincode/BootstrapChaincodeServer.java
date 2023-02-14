@@ -49,9 +49,9 @@ public class BootstrapChaincodeServer {
 		final ChaincodeServerProperties chaincodeServerProperties = new ChaincodeServerProperties();
 		chaincodeServerProperties.setServerAddress(new InetSocketAddress(parts[0], Integer.parseInt(parts[1])));
 
-		final FabricChaincodeProperties.TLSConfig tls = properties.getTls();
+		final FabricChaincodeProperties.TLSProperties tls = properties.getTls();
 		if (tls != null && tls.isEnabled()) {
-			final FabricChaincodeProperties.DevMode devMode = properties.getDevMode();
+			final FabricChaincodeProperties.DevModeProperties devMode = properties.getDevMode();
 			if (devMode != null && devMode.isEnabled()) {
 				throw new RuntimeException("Invalid State: Both TLS & DevMode are enabled!");
 			}

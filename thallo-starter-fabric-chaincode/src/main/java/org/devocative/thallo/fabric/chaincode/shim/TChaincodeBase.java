@@ -10,7 +10,6 @@ import org.hyperledger.fabric.contract.execution.SerializerInterface;
 import org.hyperledger.fabric.contract.routing.ContractDefinition;
 import org.hyperledger.fabric.contract.routing.RoutingRegistry;
 import org.hyperledger.fabric.contract.routing.TxFunction;
-import org.hyperledger.fabric.contract.routing.TypeRegistry;
 import org.hyperledger.fabric.metrics.Metrics;
 import org.hyperledger.fabric.shim.ChaincodeBase;
 import org.hyperledger.fabric.shim.ChaincodeStub;
@@ -63,7 +62,7 @@ public class TChaincodeBase extends ChaincodeBase {
 
 	@PostConstruct
 	public void init() {
-		final FabricChaincodeProperties.DevMode devMode = properties.getDevMode();
+		final FabricChaincodeProperties.DevModeProperties devMode = properties.getDevMode();
 
 		final List<String> args = new ArrayList<>();
 		args.add("-i");
@@ -104,9 +103,9 @@ public class TChaincodeBase extends ChaincodeBase {
 			throw new RuntimeException("Unable to locate Serializers", e);
 		}
 
-		final TypeRegistry typeRegistry = TypeRegistry.getRegistry();
-		registry.findAndSetContracts(typeRegistry);
-		//TODO???
+		//TODO: there is no need for @DataType registry
+		//final TypeRegistry typeRegistry = TypeRegistry.getRegistry();
+		//registry.findAndSetContracts(typeRegistry);
 		//MetadataBuilder.initialize(registry, typeRegistry);
 		//log.info("TChaincodeBase.Metadata: {}", MetadataBuilder.debugString());
 	}

@@ -1,8 +1,8 @@
 package org.devocative.thallo.fabric.samples.gateway.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.devocative.thallo.fabric.samples.gateway.iservice.ISampleContract;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -10,11 +10,19 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class SampleService {
+	private static final Logger log = LoggerFactory.getLogger(SampleService.class);
+
 	private final ISampleContract contract;
+
+	// ------------------------------
+
+	public SampleService(ISampleContract contract) {
+		this.contract = contract;
+	}
+
+	// ------------------------------
 
 	@PostConstruct
 	public void init() {

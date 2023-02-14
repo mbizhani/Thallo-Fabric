@@ -1,11 +1,8 @@
 package org.devocative.thallo.fabric.chaincode.shim;
 
-import org.devocative.thallo.fabric.chaincode.ClassUtil;
-import org.devocative.thallo.fabric.chaincode.config.FabricChaincodeProperties;
 import org.devocative.thallo.fabric.chaincode.shim.vo.TContractDefinition;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.ContractRuntimeException;
-import org.hyperledger.fabric.contract.annotation.DataType;
 import org.hyperledger.fabric.contract.annotation.Transaction;
 import org.hyperledger.fabric.contract.execution.InvocationRequest;
 import org.hyperledger.fabric.contract.routing.ContractDefinition;
@@ -21,7 +18,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class TRoutingRegistry implements RoutingRegistry {
@@ -29,13 +25,11 @@ public class TRoutingRegistry implements RoutingRegistry {
 
 	private final Map<String, ContractDefinition> contracts = new HashMap<>();
 
-	private final FabricChaincodeProperties properties;
 	private final ApplicationContext context;
 
 	// ------------------------------
 
-	public TRoutingRegistry(FabricChaincodeProperties properties, ApplicationContext context) {
-		this.properties = properties;
+	public TRoutingRegistry(ApplicationContext context) {
 		this.context = context;
 	}
 
@@ -102,19 +96,6 @@ public class TRoutingRegistry implements RoutingRegistry {
 
 	@Override
 	public void findAndSetContracts(TypeRegistry typeRegistry) {
-		final Set<String> basePackages = ClassUtil.findBasePackages(context);
-		basePackages.addAll(properties.getDataType().getScanPackages());
-
-		log.info("Scan for @DataType: basePackage = {}", basePackages);
-
-		ClassUtil.scanPackagesForAnnotatedClasses(DataType.class, basePackages, beanDefinition -> {
-			try {
-				final Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
-				typeRegistry.addDataType(beanClass);
-				log.info("Register @DataType: {}", beanClass.getName());
-			} catch (ClassNotFoundException e) {
-				log.warn("@DataType Class Not Found: {}", beanDefinition.getBeanClassName(), e);
-			}
-		});
+		throw new RuntimeException("No need for @DataType registry!");
 	}
 }

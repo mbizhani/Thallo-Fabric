@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 public class FabricClientMethodHandler implements InvocationHandler {
@@ -66,7 +67,11 @@ public class FabricClientMethodHandler implements InvocationHandler {
 			}
 
 			final byte[] result;
+			final boolean returnAsString;
 			if (method.isAnnotationPresent(Submit.class)) {
+				final Submit submit = method.getAnnotation(Submit.class);
+				returnAsString = submit.returnAsString();
+
 				if (log.isDebugEnabled()) {
 					log.debug("Submit: chaincode=[{}], method=[{}], args={}",
 						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
@@ -76,6 +81,9 @@ public class FabricClientMethodHandler implements InvocationHandler {
 
 				result = hlfService.submit(chaincode, method.getName(), chaincodeArgs);
 			} else if (method.isAnnotationPresent(Evaluate.class)) {
+				final Evaluate evaluate = method.getAnnotation(Evaluate.class);
+				returnAsString = evaluate.returnAsString();
+
 				if (log.isDebugEnabled()) {
 					log.debug("Evaluate: chaincode=[{}], method=[{}], args={}",
 						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
@@ -91,18 +99,25 @@ public class FabricClientMethodHandler implements InvocationHandler {
 
 			log.info("Result: method=[{}]", method.getName());
 
-			return processResult(method, result);
+			return processResult(method, result, returnAsString);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("HlfClient: %s::%s(%s)",
 				clientInterfaceClass.getCanonicalName(), method.getName(), Arrays.toString(args)), e);
 		}
 	}
 
-	private Object processResult(Method method, byte[] result) throws IOException {
-		final Class<?> returnClass = method.getReturnType();
-		if (Void.TYPE.equals(returnClass)) {
+	private Object processResult(Method method, byte[] result, boolean returnAsString) throws IOException {
+		final Type returnType = method.getGenericReturnType();
+
+		if (Void.TYPE.equals(returnType)) {
 			return null;
 		}
-		return objectMapper.readValue(result, returnClass);
+
+		if (returnAsString) {
+			final String resultStr = objectMapper.readValue(result, String.class);
+			return objectMapper.readValue(resultStr, new GeneralTypeReference<>(returnType));
+		} else {
+			return objectMapper.readValue(result, new GeneralTypeReference<>(returnType));
+		}
 	}
 }

@@ -1,7 +1,5 @@
 package org.devocative.thallo.fabric.gateway.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.devocative.thallo.fabric.gateway.config.FabricGatewayProperties;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricCAService;
 import org.hyperledger.fabric.gateway.*;
@@ -14,6 +12,8 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
 import org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric_ca.sdk.exception.RegistrationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +25,11 @@ import java.security.cert.CertificateException;
 import java.util.Properties;
 import java.util.Set;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
-@ConditionalOnProperty(name = "thallo.fabric.gateway.ca-server")
+@ConditionalOnProperty(name = "thallo.fabric.gateway.ca.server.url")
 public class FabricCAService implements IFabricCAService {
+	private static final Logger log = LoggerFactory.getLogger(FabricCAService.class);
+
 	private final FabricGatewayProperties properties;
 
 	private HFCAClient caClient;
@@ -37,16 +37,22 @@ public class FabricCAService implements IFabricCAService {
 
 	// ------------------------------
 
+	public FabricCAService(FabricGatewayProperties properties) {
+		this.properties = properties;
+	}
+
+	// ------------------------------
+
 	@PostConstruct
 	public void init() {
 		try {
 			final Properties props = new Properties();
-			props.put("pemFile", properties.getCaServer().getPemFile());
+			props.put("pemFile", properties.getCa().getServer().getPemFile());
 			props.put("allowAllHostNames", "true");
-			caClient = HFCAClient.createNewInstance(properties.getCaServer().getUrl(), props);
+			caClient = HFCAClient.createNewInstance(properties.getCa().getServer().getUrl(), props);
 			caClient.setCryptoSuite(CryptoSuiteFactory.getDefault().getCryptoSuite());
 
-			wallet = Wallets.newFileSystemWallet(Paths.get(properties.getIdentityWalletDir()));
+			wallet = Wallets.newFileSystemWallet(Paths.get(properties.getCa().getWalletDir()));
 		} catch (Exception e) {
 			throw new RuntimeException("HlfCAService.init", e);
 		}
@@ -116,11 +122,20 @@ public class FabricCAService implements IFabricCAService {
 
 	// ------------------------------
 
-	@RequiredArgsConstructor
 	static class CAUser implements User {
 		private final String name;
 		private final X509Identity identity;
 		private final String mspId;
+
+		// ------------------------------
+
+		public CAUser(String name, X509Identity identity, String mspId) {
+			this.name = name;
+			this.identity = identity;
+			this.mspId = mspId;
+		}
+
+		// ------------------------------
 
 		@Override
 		public String getName() {

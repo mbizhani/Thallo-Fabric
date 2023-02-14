@@ -59,10 +59,10 @@ public class FabricGatewayService implements IFabricGatewayService {
 			builder.networkConfig(networkConfigPath);
 
 			if (caServiceOpt.isPresent()) {
-				final String username = properties.getCaServer().getUsername();
+				final String username = properties.getCa().getServer().getUsername();
 
 				final IFabricCAService caService = caServiceOpt.get();
-				final Wallet wallet = caService.enroll(username, properties.getCaServer().getPassword());
+				final Wallet wallet = caService.enroll(username, properties.getCa().getServer().getPassword());
 
 				builder.identity(wallet, username);
 			} else {
