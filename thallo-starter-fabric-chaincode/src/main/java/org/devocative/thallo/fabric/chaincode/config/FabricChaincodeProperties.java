@@ -11,10 +11,9 @@ import java.util.List;
 public class FabricChaincodeProperties {
 	private String id;
 	private String serverAddress;
-	private DataTypeConfig dataType = new DataTypeConfig();
 	private String defaultSerializer = "org.devocative.thallo.fabric.chaincode.shim.TJSONSerializer";
-	private TLSProperties tls = new TLSProperties();
-	private DevModeProperties devMode = new DevModeProperties();
+	private TLSProperties tls;
+	private DevModeProperties devMode;
 
 	public String getId() {
 		return id;
@@ -30,14 +29,6 @@ public class FabricChaincodeProperties {
 
 	public void setServerAddress(String serverAddress) {
 		this.serverAddress = serverAddress;
-	}
-
-	public DataTypeConfig getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(DataTypeConfig dataType) {
-		this.dataType = dataType;
 	}
 
 	public String getDefaultSerializer() {
