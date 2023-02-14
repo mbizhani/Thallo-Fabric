@@ -10,8 +10,8 @@ public class FabricGatewayProperties {
 	private String chaincode;
 	private String connectionProfileFile;
 	private String orgMspId;
-	private CAProperties ca = new CAProperties();
-	private IdentityProperties identity = new IdentityProperties();
+	private CAProperties ca;
+	private IdentityProperties identity;
 
 	public String getChannel() {
 		return channel;
@@ -125,7 +125,9 @@ public class FabricGatewayProperties {
 
 	public static class IdentityProperties {
 		private String privateKeyPemFile;
+		private String privateKeyPem;
 		private String certificatePemFile;
+		private String certificatePem;
 
 		public String getPrivateKeyPemFile() {
 			return privateKeyPemFile;
@@ -135,12 +137,47 @@ public class FabricGatewayProperties {
 			this.privateKeyPemFile = privateKeyPemFile;
 		}
 
+		public String getPrivateKeyPem() {
+			return privateKeyPem;
+		}
+
+		public void setPrivateKeyPem(String privateKeyPem) {
+			this.privateKeyPem = privateKeyPem;
+		}
+
 		public String getCertificatePemFile() {
 			return certificatePemFile;
 		}
 
 		public void setCertificatePemFile(String certificatePemFile) {
 			this.certificatePemFile = certificatePemFile;
+		}
+
+		public String getCertificatePem() {
+			return certificatePem;
+		}
+
+		public void setCertificatePem(String certificatePem) {
+			this.certificatePem = certificatePem;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder builder = new StringBuilder();
+
+			if (certificatePemFile != null) {
+				builder.append("certificatePemFile=[").append(certificatePemFile).append("] ");
+			} else if (certificatePem != null) {
+				builder.append("certificatePem=[***] ");
+			}
+
+			if (privateKeyPemFile != null) {
+				builder.append("privateKeyPemFile=[").append(privateKeyPemFile).append("]");
+			} else if (privateKeyPem != null) {
+				builder.append("privateKeyPem=[***]");
+			}
+
+			return builder.toString();
 		}
 	}
 }

@@ -15,9 +15,12 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
@@ -65,12 +68,15 @@ public class FabricGatewayService implements IFabricGatewayService {
 				final Wallet wallet = caService.enroll(username, properties.getCa().getServer().getPassword());
 
 				builder.identity(wallet, username);
-			} else {
-				//TODO: assert properties.getIdentity() not null
-				//TODO: read pem files content instead of file address
-				final PrivateKey privateKey = Identities.readPrivateKey(new FileReader(properties.getIdentity().getPrivateKeyPemFile()));
-				final X509Certificate certificate = Identities.readX509Certificate(new FileReader(properties.getIdentity().getCertificatePemFile()));
+			} else if (properties.getIdentity() != null) {
+				log.info("Identity for Gateway: {}", properties.getIdentity());
+
+				final PrivateKey privateKey = loadPrivateKey();
+				final X509Certificate certificate = loadCertificate();
+
 				builder.identity(Identities.newX509Identity(properties.getOrgMspId(), certificate, privateKey));
+			} else {
+				throw new RuntimeException("Invalid application config: 'ca.server' or 'identity' must be set");
 			}
 
 			final Gateway gateway = builder.connect();
@@ -125,4 +131,37 @@ public class FabricGatewayService implements IFabricGatewayService {
 	private String getChaincode(String chaincode) {
 		return StringUtils.hasLength(chaincode) ? chaincode : properties.getChaincode();
 	}
+
+	private PrivateKey loadPrivateKey() throws IOException, InvalidKeyException {
+		final FabricGatewayProperties.IdentityProperties identity = properties.getIdentity();
+
+		final PrivateKey privateKey;
+		if (identity.getPrivateKeyPemFile() != null) {
+			try (final FileReader reader = new FileReader(identity.getPrivateKeyPemFile())) {
+				privateKey = Identities.readPrivateKey(reader);
+			}
+		} else if (identity.getPrivateKeyPem() != null) {
+			privateKey = Identities.readPrivateKey(identity.getPrivateKeyPem());
+		} else {
+			throw new RuntimeException("Invalid application config: private key data must be set in 'identity'");
+		}
+		return privateKey;
+	}
+
+	private X509Certificate loadCertificate() throws IOException, CertificateException {
+		final FabricGatewayProperties.IdentityProperties identity = properties.getIdentity();
+
+		final X509Certificate certificate;
+		if (identity.getCertificatePemFile() != null) {
+			try (final FileReader reader = new FileReader(identity.getCertificatePemFile())) {
+				certificate = Identities.readX509Certificate(reader);
+			}
+		} else if (identity.getCertificatePem() != null) {
+			certificate = Identities.readX509Certificate(identity.getCertificatePem());
+		} else {
+			throw new RuntimeException("Invalid application config: certificate data must be set in 'identity'");
+		}
+		return certificate;
+	}
+
 }
