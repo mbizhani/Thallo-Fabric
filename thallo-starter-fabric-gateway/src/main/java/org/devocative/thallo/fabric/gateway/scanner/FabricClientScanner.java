@@ -1,6 +1,7 @@
 package org.devocative.thallo.fabric.gateway.scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.devocative.thallo.fabric.gateway.EnableFabricGateway;
 import org.devocative.thallo.fabric.gateway.FabricClient;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
@@ -72,7 +73,9 @@ public class FabricClientScanner implements ImportBeanDefinitionRegistrar, Resou
 		provider.setResourceLoader(resourceLoader);
 		provider.addIncludeFilter(new AnnotationTypeFilter(FabricClient.class));
 
-		final ObjectMapper objectMapper = new ObjectMapper();
+		final ObjectMapper objectMapper = JsonMapper.builder()
+			.findAndAddModules()
+			.build();
 
 		try {
 			for (String basePackage : basePackages) {

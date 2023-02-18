@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class TJSONSerializer implements SerializerInterface {
@@ -28,6 +29,15 @@ public class TJSONSerializer implements SerializerInterface {
 	public byte[] toBuffer(Object value, TypeSchema ts) {
 		log.debug("TJSONSerializer - toBuffer: type={}", ts);
 
+		if (value == null) {
+			return null;
+		} else if (value instanceof CharSequence) {
+			final CharSequence cs = (CharSequence) value;
+			return cs.toString().getBytes(StandardCharsets.UTF_8);
+		} else if (value instanceof byte[]) {
+			return (byte[]) value;
+		}
+
 		try {
 			return mapper.writeValueAsBytes(value);
 		} catch (JsonProcessingException e) {
@@ -40,7 +50,7 @@ public class TJSONSerializer implements SerializerInterface {
 		log.debug("TJSONSerializer - fromBuffer: type={}", ts);
 
 		final TypeSchema schema = (TypeSchema) ts.get("schema");
-		final Class<?> cls = (Class) schema.get("type");
+		final Class<?> cls = (Class<?>) schema.get("type");
 
 		try {
 			return mapper.readValue(buffer, cls);

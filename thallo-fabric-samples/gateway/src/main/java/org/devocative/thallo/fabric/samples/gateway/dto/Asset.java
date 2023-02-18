@@ -1,54 +1,21 @@
 package org.devocative.thallo.fabric.samples.gateway.dto;
 
-import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+
+@Getter
+@Setter
+@ToString
 public class Asset {
 	private String id;
 	private String name;
 	private BigDecimal price;
-
-	// ------------------------------
-	public Asset() {
-	}
-
-	public Asset(String id, String name, BigDecimal price) {
-		this.id = id;
-		this.name = name;
-		this.price = price;
-	}
-
-	// ------------------------------
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public BigDecimal getPrice() {
-		return price;
-	}
-
-	public void setPrice(BigDecimal price) {
-		this.price = price;
-	}
-
-	@Override
-	public String toString() {
-		return "Asset{" +
-			"id='" + id + '\'' +
-			", name='" + name + '\'' +
-			", price=" + price +
-			'}';
-	}
+	private Instant createdDateTime;
+	private Instant updatedDateTime;
+	private String createdOrgId;
+	private String updatedOrgId;
 }

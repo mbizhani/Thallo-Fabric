@@ -10,7 +10,7 @@
 	<packaging>pom</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
-	<description>Spring Boot Integration for Hyperledger Fabric Gateway &amp; Chaincode</description>
+	<description>Spring Boot Integration for Hyperledger Fabric Chaincode &amp; Gateway</description>
 	<url>https://github.com/mbizhani/thallo-fabric</url>
 
 	<parent>

@@ -5,6 +5,7 @@ import org.devocative.thallo.fabric.gateway.FabricClient;
 import org.devocative.thallo.fabric.gateway.Submit;
 import org.devocative.thallo.fabric.samples.gateway.dto.Asset;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -17,11 +18,14 @@ public interface ISampleContract {
 	void setTime(Date dt, List<String> list);
 
 	@Submit
-	Asset createAsset();
+	Asset createAsset(String name, BigDecimal price);
 
 	@Submit
-	void updateAsset(Asset asset);
+	void updateAsset(String id, String name, BigDecimal price);
 
 	@Evaluate
-	List<Asset> list();
+	byte[] getAsset(String id);
+
+	@Evaluate
+	List<Asset> getAllAssets();
 }

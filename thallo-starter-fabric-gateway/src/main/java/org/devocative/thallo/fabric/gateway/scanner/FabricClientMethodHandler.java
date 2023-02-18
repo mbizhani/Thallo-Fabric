@@ -67,11 +67,7 @@ public class FabricClientMethodHandler implements InvocationHandler {
 			}
 
 			final byte[] result;
-			final boolean returnAsString;
 			if (method.isAnnotationPresent(Submit.class)) {
-				final Submit submit = method.getAnnotation(Submit.class);
-				returnAsString = submit.returnAsString();
-
 				if (log.isDebugEnabled()) {
 					log.debug("Submit: chaincode=[{}], method=[{}], args={}",
 						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
@@ -81,9 +77,6 @@ public class FabricClientMethodHandler implements InvocationHandler {
 
 				result = hlfService.submit(chaincode, method.getName(), chaincodeArgs);
 			} else if (method.isAnnotationPresent(Evaluate.class)) {
-				final Evaluate evaluate = method.getAnnotation(Evaluate.class);
-				returnAsString = evaluate.returnAsString();
-
 				if (log.isDebugEnabled()) {
 					log.debug("Evaluate: chaincode=[{}], method=[{}], args={}",
 						chaincode, method.getName(), Arrays.toString(chaincodeArgs));
@@ -99,25 +92,22 @@ public class FabricClientMethodHandler implements InvocationHandler {
 
 			log.info("Result: method=[{}]", method.getName());
 
-			return processResult(method, result, returnAsString);
+			return processResult(method, result);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("HlfClient: %s::%s(%s)",
 				clientInterfaceClass.getCanonicalName(), method.getName(), Arrays.toString(args)), e);
 		}
 	}
 
-	private Object processResult(Method method, byte[] result, boolean returnAsString) throws IOException {
+	private Object processResult(Method method, byte[] result) throws IOException {
 		final Type returnType = method.getGenericReturnType();
 
 		if (Void.TYPE.equals(returnType)) {
 			return null;
+		} else if (byte[].class.equals(returnType)) {
+			return result;
 		}
 
-		if (returnAsString) {
-			final String resultStr = objectMapper.readValue(result, String.class);
-			return objectMapper.readValue(resultStr, new GeneralTypeReference<>(returnType));
-		} else {
-			return objectMapper.readValue(result, new GeneralTypeReference<>(returnType));
-		}
+		return objectMapper.readValue(result, new GeneralTypeReference<>(returnType));
 	}
 }
