@@ -114,18 +114,20 @@ public class FabricClientScanner implements ImportBeanDefinitionRegistrar, Resou
 		final Map<String, Object> attributes = importingClassMetadata
 			.getAnnotationAttributes(EnableFabricGateway.class.getCanonicalName());
 
-		for (String pkg : (String[]) attributes.get("value")) {
-			if (StringUtils.hasText(pkg)) {
-				basePackages.add(pkg);
+		if (attributes != null && !attributes.isEmpty()) {
+			for (String pkg : (String[]) attributes.get("value")) {
+				if (StringUtils.hasText(pkg)) {
+					basePackages.add(pkg);
+				}
 			}
-		}
-		for (String pkg : (String[]) attributes.get("basePackages")) {
-			if (StringUtils.hasText(pkg)) {
-				basePackages.add(pkg);
+			for (String pkg : (String[]) attributes.get("basePackages")) {
+				if (StringUtils.hasText(pkg)) {
+					basePackages.add(pkg);
+				}
 			}
-		}
-		for (Class<?> clazz : (Class[]) attributes.get("basePackageClasses")) {
-			basePackages.add(ClassUtils.getPackageName(clazz));
+			for (Class<?> clazz : (Class<?>[]) attributes.get("basePackageClasses")) {
+				basePackages.add(ClassUtils.getPackageName(clazz));
+			}
 		}
 
 		if (basePackages.isEmpty()) {

@@ -10,4 +10,6 @@ public interface IFabricGatewayService {
 	byte[] evaluate(String method, String... args) throws ContractException;
 
 	byte[] evaluate(String chaincode, String method, String... args) throws ContractException;
+
+	String getDefaultChaincode();
 }

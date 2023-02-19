@@ -126,6 +126,11 @@ public class FabricGatewayService implements IFabricGatewayService {
 		return contract.evaluateTransaction(method, args != null ? args : new String[0]);
 	}
 
+	@Override
+	public String getDefaultChaincode() {
+		return properties.getChaincode();
+	}
+
 	// ------------------------------
 
 	private String getChaincode(String chaincode) {

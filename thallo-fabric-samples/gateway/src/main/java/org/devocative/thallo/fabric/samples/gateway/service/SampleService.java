@@ -31,8 +31,11 @@ public class SampleService {
 
 		contract.updateAsset(asset.getId(), "نیم سکه", new BigDecimal(1500));
 
-		log.info("Get Asset: {}", new String(contract.getAsset(asset.getId())));
+		log.info("GetAsset: {}", contract.getAsset(asset.getId()));
+		log.info("GetAssetArr: {}", new String(contract.getAssetArr(asset.getId())));
+		log.info("GetAssetStr: {}", contract.getAssetStr(asset.getId()));
 
 		log.info("GetAllAssets: {}", contract.getAllAssets());
+		log.info("GetAllAssetsStr: {}", contract.getAllAssetsStr());
 	}
 }

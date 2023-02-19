@@ -24,8 +24,17 @@ public interface ISampleContract {
 	void updateAsset(String id, String name, BigDecimal price);
 
 	@Evaluate
-	byte[] getAsset(String id);
+	Asset getAsset(String id);
+
+	@Evaluate(method = "getAsset")
+	byte[] getAssetArr(String id);
+
+	@Evaluate(method = "getAsset")
+	String getAssetStr(String id);
 
 	@Evaluate
 	List<Asset> getAllAssets();
+
+	@Evaluate(method = "getAllAssets")
+	String getAllAssetsStr();
 }
