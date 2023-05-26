@@ -12,7 +12,6 @@ This project is an integration between
 Add following dependency to your Spring Boot's `pom.xml` file:
 
 ```xml
-
 <dependency>
   <groupId>org.devocative.thallo</groupId>
   <artifactId>thallo-starter-fabric-chaincode</artifactId>
@@ -23,7 +22,6 @@ Add following dependency to your Spring Boot's `pom.xml` file:
 You can create a contract like the following code:
 
 ```java
-
 @Default
 @Contract(name = "sample")
 @Component
@@ -59,8 +57,20 @@ Add following dependency to your Spring Boot's `pom.xml` file:
 </dependency>
 ```
 
-Then annotate your spring main class (the class having `@SpringBootApplication`) with `@EnableFabricGateway`. Finally,
-create an interface such as the following one:
+Then annotate your spring main class with `@EnableFabricGateway`:
+
+```java
+
+@EnableFabricGateway
+@SpringBootApplication
+public class SampleGatewayApplication {
+  public static void main(String[] args) {
+    SpringApplication.run(SampleGatewayApplication.class, args);
+  }
+}
+```
+
+Finally, create an interface such as the following one:
 
 ```java
 
@@ -111,7 +121,7 @@ thallo:
 - Clone this repository
 - Download `configtxgen`, `orderer`, and `peer` binary files
   from [Fabric's GitHub](https://github.com/hyperledger/fabric/releases)
-- Create dir `start-fabric-dev-mode/files/bin` and copy mentioned files in it
+  - Create dir `start-fabric-dev-mode/files/bin` and copy mentioned files in it
 - Exec `./start-fabric-dev-mode/run.sh start`
 - Now start your chaincode spring boot application with following configuration (`application.yml`):
 
