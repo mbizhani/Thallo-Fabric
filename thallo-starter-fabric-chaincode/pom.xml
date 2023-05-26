@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.devocative.thallo</groupId>
 		<artifactId>fabric-parent</artifactId>
-		<version>1.0</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>thallo-starter-fabric-chaincode</artifactId>
 	<packaging>jar</packaging>
