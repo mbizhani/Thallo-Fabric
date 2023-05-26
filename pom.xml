@@ -30,7 +30,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<d.fabric-gateway>2.2.7</d.fabric-gateway>
+		<d.fabric-gateway>2.2.8</d.fabric-gateway>
 		<d.fabric-shim>2.4.1</d.fabric-shim>
 	</properties>
 
@@ -49,11 +49,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>jakarta.annotation</groupId>
-			<artifactId>jakarta.annotation-api</artifactId>
 		</dependency>
 
 
