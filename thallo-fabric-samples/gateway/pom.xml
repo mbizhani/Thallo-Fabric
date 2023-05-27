@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.devocative.thallo</groupId>
 		<artifactId>thallo-fabric-samples</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>gateway</artifactId>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>org.devocative.thallo</groupId>
 			<artifactId>thallo-starter-fabric-gateway</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

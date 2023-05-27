@@ -29,7 +29,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<d.fabric-gateway>2.2.8</d.fabric-gateway>
-		<d.fabric-shim>2.4.1</d.fabric-shim>
+		<d.fabric-shim>2.5.0</d.fabric-shim>
 	</properties>
 
 	<dependencies>
