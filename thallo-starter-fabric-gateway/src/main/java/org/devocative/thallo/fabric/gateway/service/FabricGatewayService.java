@@ -1,11 +1,14 @@
 package org.devocative.thallo.fabric.gateway.service;
 
+import com.google.protobuf.ByteString;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.devocative.thallo.fabric.gateway.SystemException;
 import org.devocative.thallo.fabric.gateway.config.FabricGatewayProperties;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricCAService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricGatewayService;
 import org.devocative.thallo.fabric.gateway.iservice.IFabricTransactionReader;
 import org.hyperledger.fabric.gateway.*;
+import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -22,6 +25,7 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -112,6 +116,9 @@ public class FabricGatewayService implements IFabricGatewayService {
 			return contract.submitTransaction(method, args != null ? args : new String[0]);
 		} catch (TimeoutException | InterruptedException e) {
 			throw new SystemException(e);
+		} catch (ContractException e) {
+			logContractException(e);
+			throw e;
 		}
 	}
 
@@ -169,4 +176,30 @@ public class FabricGatewayService implements IFabricGatewayService {
 		return certificate;
 	}
 
+	private void logContractException(ContractException e) {
+		Collection<ProposalResponse> responses = e.getProposalResponses();
+
+		final StringBuilder builder = new StringBuilder();
+		builder
+			.append(e.getMessage())
+			.append("\nProposalResponses: size=").append(responses.size());
+
+		for (ProposalResponse response : responses) {
+			final ByteString prPayload = response.getProposalResponse().getPayload();
+
+			final int size = prPayload.size();
+			final String sha256 = size > 0 ? DigestUtils.sha256Hex(prPayload.toByteArray()) : "";
+
+			builder
+				.append("\n\tPeer=[").append(response.getPeer().getName()).append("]")
+				.append(" - Proposal.Rs => ")
+				.append("Status=[").append(response.getStatus()).append("]")
+				.append(" - TxId=[").append(response.getTransactionID()).append("]")
+				.append(" - Message=[").append(response.getMessage()).append("]")
+				.append(" - Len(payload)=[").append(size).append("]")
+				.append(" - SHA256(payload)=[").append(sha256).append("]");
+		}
+
+		log.error("ContractException: ***** {}", builder);
+	}
 }
