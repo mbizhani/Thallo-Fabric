@@ -38,12 +38,35 @@
 			<version>1.14.2</version>
 		</dependency>
 
-		<!-- Just Added for JavaDoc Maven Plugin Error -->
+
+		<!-- GRPC -->
+
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-stub</artifactId>
-			<version>1.46.0</version>
+			<version>${d.grpc}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<version>${d.grpc}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-census</artifactId>
+			<version>${d.grpc}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-netty-shaded</artifactId>
+			<version>${d.grpc}</version>
+		</dependency>
+
+
+		<!-- JACKSON -->
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
