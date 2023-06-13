@@ -88,12 +88,12 @@ public class FabricClientScanner implements ImportBeanDefinitionRegistrar, Resou
 					final GenericBeanDefinition gbd = new GenericBeanDefinition();
 					gbd.setBeanClass(clientInterfaceClass);
 					gbd.setInstanceSupplier(() -> {
-						final IFabricGatewayService calendarService = beanFactory.getBean(IFabricGatewayService.class);
+						final IFabricGatewayService gatewayService = beanFactory.getBean(IFabricGatewayService.class);
 
 						return Proxy.newProxyInstance(
 							getClass().getClassLoader(),
 							new Class[]{clientInterfaceClass},
-							new FabricClientMethodHandler(clientInterfaceClass, calendarService, objectMapper));
+							new FabricClientMethodHandler(clientInterfaceClass, gatewayService, objectMapper));
 					});
 					gbd.setLazyInit(true);
 					registry.registerBeanDefinition(clientInterfaceClass.getName(), gbd);
