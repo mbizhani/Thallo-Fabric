@@ -1,5 +1,9 @@
 # Thallo & Hyperledger Fabric
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-chaincode/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-chaincode)
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-gateway/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-gateway)
+
 ## Introduction
 
 This project is an integration between
