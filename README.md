@@ -9,13 +9,16 @@ This project is an integration between
 
 ### Chaincode
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-chaincode/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-chaincode)
+
 Add following dependency to your Spring Boot's `pom.xml` file:
 
 ```xml
+
 <dependency>
-  <groupId>org.devocative.thallo</groupId>
-  <artifactId>thallo-starter-fabric-chaincode</artifactId>
-  <version>1.0</version>
+	<groupId>org.devocative.thallo</groupId>
+	<artifactId>thallo-starter-fabric-chaincode</artifactId>
+	<version>1.0</version>
 </dependency>
 ```
 
@@ -35,10 +38,10 @@ public class SampleContract implements ContractInterface {
   @Transaction(intent = EVALUATE)
   public byte[] getAsset(final Context ctx, String id) {
     final ChaincodeStub stub = ctx.getStub();
-    return stub.getState(id);
+	  return stub.getState(id);
   }
 
-  // Other functions ...
+	// Other functions ...
 }
 ```
 
@@ -46,14 +49,16 @@ Now you can deploy your chaincode in hyperledger fabric network.
 
 ### Gateway (client)
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-gateway/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.devocative.thallo/thallo-starter-fabric-gateway)
+
 Add following dependency to your Spring Boot's `pom.xml` file:
 
 ```xml
 
 <dependency>
-  <groupId>org.devocative.thallo</groupId>
-  <artifactId>thallo-starter-fabric-gateway</artifactId>
-  <version>1.0</version>
+	<groupId>org.devocative.thallo</groupId>
+	<artifactId>thallo-starter-fabric-gateway</artifactId>
+	<version>1.0</version>
 </dependency>
 ```
 
