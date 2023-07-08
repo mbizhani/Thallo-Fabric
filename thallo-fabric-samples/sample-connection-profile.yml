@@ -8,8 +8,8 @@ organizations:
   SampleOrg:
     mspid: SampleOrg
     peers:
-      - 127.0.0.1
+      - hlf-peer
 
 peers:
-  127.0.0.1:
+  hlf-peer:
     url: "grpc://127.0.0.1:7051"
