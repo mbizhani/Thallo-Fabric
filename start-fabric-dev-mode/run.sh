@@ -1,8 +1,9 @@
 #!/bin/bash
 
-BASE_DIR="$(dirname "$(realpath "$0")")/files"
+BASE_DIR="$(dirname "$(realpath "$0")")"
+FILES_DIR="${BASE_DIR}/files"
 echo "Base Dir = ${BASE_DIR}"
-OUT_DIR="${BASE_DIR}/out"
+OUT_DIR="${FILES_DIR}/out"
 CC_NAME="mycc"
 CC_VER="1.0"
 CH_NAME="ch1"
@@ -12,7 +13,7 @@ export FABRIC_CFG_PATH="${OUT_DIR}"
 ####
 
 function printInfo() {
-  "${BASE_DIR}"/bin/configtxgen --version
+  "${FILES_DIR}"/bin/configtxgen --version
 }
 
 function runInPeer() {
@@ -22,7 +23,7 @@ function runInPeer() {
 }
 
 function stop() {
-  docker compose down
+  docker compose -f "${BASE_DIR}"/docker-compose.yml down
 
   rm -rf "${OUT_DIR}"
 }
@@ -31,22 +32,22 @@ function start() {
   ########
   ## INIT
   mkdir -p "${OUT_DIR}"
-  cp -r "${BASE_DIR}"/config/{configtx.yaml,msp} "${OUT_DIR}"
+  cp -r "${FILES_DIR}"/config/{configtx.yaml,msp} "${OUT_DIR}"
 
-  "${BASE_DIR}"/bin/configtxgen \
+  "${FILES_DIR}"/bin/configtxgen \
     -profile SampleDevModeSolo \
     -channelID syschannel \
     -outputBlock genesisblock \
     -configPath "${FABRIC_CFG_PATH}" \
     -outputBlock "${FABRIC_CFG_PATH}/genesisblock"
 
-  docker compose up -d
+  docker compose -f "${BASE_DIR}"/docker-compose.yml up -d
   sleep 5
 
   ##################
   ## CREATE CHANNEL
 
-  "${BASE_DIR}"/bin/configtxgen \
+  "${FILES_DIR}"/bin/configtxgen \
     -channelID ${CH_NAME} \
     -outputCreateChannelTx "${OUT_DIR}/${CH_NAME}.tx" \
     -profile SampleSingleMSPChannel \

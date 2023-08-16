@@ -2,6 +2,7 @@ package org.devocative.thallo.fabric.chaincode.shim;
 
 import org.devocative.thallo.fabric.chaincode.config.FabricChaincodeProperties;
 import org.hyperledger.fabric.contract.ContractInterface;
+import org.hyperledger.fabric.contract.ContractRuntimeException;
 import org.hyperledger.fabric.contract.annotation.Serializer;
 import org.hyperledger.fabric.contract.execution.ExecutionFactory;
 import org.hyperledger.fabric.contract.execution.ExecutionService;
@@ -133,6 +134,8 @@ public class TChaincodeBase extends ChaincodeBase {
 				final InvocationRequest request = ExecutionFactory.getInstance().createRequest(stub);
 				final TxFunction txFn = getRouting(request);
 
+				validateRequestByTxFunction(request, txFn);
+
 				final SerializerInterface si = serializers.getSerializer(txFn.getRouting().getSerializerName(),
 					Serializer.TARGET.TRANSACTION);
 				final ExecutionService executor = ExecutionFactory.getInstance().createExecutionService(si);
@@ -154,6 +157,14 @@ public class TChaincodeBase extends ChaincodeBase {
 			log.info("Namespace: {}", request.getNamespace());
 			final ContractDefinition contract = registry.getContract(request.getNamespace());
 			return contract.getUnknownRoute();
+		}
+	}
+
+	private static void validateRequestByTxFunction(InvocationRequest request, TxFunction txFn) {
+		if (txFn.getParamsList().size() != request.getArgs().size()) {
+			throw new ContractRuntimeException(String.format(
+				"Mismatch Parameter(s): chaincode func [%s] should have [%s] parameter(s), sent [%s]",
+				txFn.getName(), txFn.getParamsList().size(), request.getArgs().size()));
 		}
 	}
 }
